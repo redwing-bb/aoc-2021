@@ -1,4 +1,18 @@
 // https://adventofcode.com/2021/day/1
+//
+//  notes on my code:
+//  - ugly, imperative but functional
+//  - the bufreader / for loop needs to go
+//  - learn to use iterators
+//
+//  notes on the problem (gathered from reading reddit comments): 
+//  - sliding window problem, basic and well-known
+//  - the 2nd part you're comparing
+//    (n1 + n2 + n3) with
+//         (n2 + n3 + n4), so (n2 + n3) can be ignored, 
+//    and you can just compare n1 with n4 
+//
+//  - rw-bb 2021-12-01
 
 use std::fs::File;
 use std::io::{self, prelude::*, BufReader};
