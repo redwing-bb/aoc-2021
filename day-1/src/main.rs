@@ -11,6 +11,10 @@
 //    (n1 + n2 + n3) with
 //         (n2 + n3 + n4), so (n2 + n3) can be ignored, 
 //    and you can just compare n1 with n4 
+//  
+//  references:
+//  - sliding window:
+//    https://medium.com/outco/how-to-solve-sliding-window-problems-28d67601a66
 //
 //  - rw-bb 2021-12-01
 
