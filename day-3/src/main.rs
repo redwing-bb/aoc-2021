@@ -24,8 +24,6 @@ fn main() -> io::Result<()> {
                 _ => panic!("invalid accumulator value"),
             }
         }
-        println!("{:?}", acc0);
-        println!("{:?}", acc1);
     }
 
     // compare each position in the accumulators, building gamma and epsilon
@@ -41,35 +39,24 @@ fn main() -> io::Result<()> {
         }
     }
 
-    println!("{:?}", gamma);
-    println!("{:?}", epsilon);
-
-    // read gamma bits from array into a string...
-    let mut s = String::from("");
-    for b in gamma {
-        s.push(char::from_digit(b as u32, 10).unwrap());
-    }
-    println!("{}", s);
-
-    // in order to convert binary represented by the string into decimal
-    let g = u32::from_str_radix(&s, 2).unwrap();
-
-    // read epsilon bits from array into string
-    let mut s = String::from("");
-    for b in epsilon {
-        s.push(char::from_digit(b as u32, 10).unwrap());
-    }
-    println!("{}", s);
-
-    // to also convert it to decimal
-    let e = u32::from_str_radix(&s, 2).unwrap();
-
-    println!("gamma: {}", g);
-    println!("epsilon: {}", e);
+    let g = get_decimal(&gamma);
+    let e = get_decimal(&epsilon);
 
     println!("{}", g*e);  // part 1 answer
 
     Ok(())
+}
+
+fn get_decimal(bits: &[u8]) -> u32 {
+
+    // read bits from array into a string...
+    let mut s = String::from("");
+    for b in bits {
+        s.push(char::from_digit(*b as u32, 10).unwrap());
+    }
+
+    // ...in order to convert binary represented in string to decimal
+    u32::from_str_radix(&s, 2).unwrap()
 }
 
 #[cfg(test)]
