@@ -9,11 +9,12 @@ fn main() -> io::Result<()> {
     let file = File::open("input.txt")?;
     let reader = BufReader::new(file);
 
-    let mut acc0: [u32; 12] = [0; 12];
-    let mut acc1: [u32; 12] = [0; 12];
+    let mut acc0: [u32; 12] = [0; 12]; // count of the 0 values in each line
+    let mut acc1: [u32; 12] = [0; 12]; // count of the 1 values in each line
     let mut gamma: [u8; 12] = [0; 12];
     let mut epsilon: [u8; 12] = [0; 12];
 
+    // get the input data, counting the input bits to appropriate accumulators
     for line in reader.lines() {
         let input = line.unwrap();
         for (i, val) in input.chars().enumerate() {
@@ -27,6 +28,7 @@ fn main() -> io::Result<()> {
         println!("{:?}", acc1);
     }
 
+    // compare each position in the accumulators, building gamma and epsilon
     for n in 0..acc0.len() {
         if acc0[n] > acc1[n] {
             gamma[n] = 0;
@@ -42,24 +44,30 @@ fn main() -> io::Result<()> {
     println!("{:?}", gamma);
     println!("{:?}", epsilon);
 
+    // read gamma bits from array into a string...
     let mut s = String::from("");
     for b in gamma {
         s.push(char::from_digit(b as u32, 10).unwrap());
     }
     println!("{}", s);
+
+    // in order to convert binary represented by the string into decimal
     let g = u32::from_str_radix(&s, 2).unwrap();
 
+    // read epsilon bits from array into string
     let mut s = String::from("");
     for b in epsilon {
         s.push(char::from_digit(b as u32, 10).unwrap());
     }
     println!("{}", s);
+
+    // to also convert it to decimal
     let e = u32::from_str_radix(&s, 2).unwrap();
 
     println!("gamma: {}", g);
     println!("epsilon: {}", e);
 
-    println!("{}", g*e);
+    println!("{}", g*e);  // part 1 answer
 
     Ok(())
 }
