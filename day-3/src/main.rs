@@ -11,23 +11,25 @@ fn main() -> io::Result<()> {
 
     let mut acc0: [u32; 12] = [0; 12]; // count of the 0 values in each line
     let mut acc1: [u32; 12] = [0; 12]; // count of the 1 values in each line
+    let mut in_len = 0;
     let mut gamma: [u8; 12] = [0; 12];
     let mut epsilon: [u8; 12] = [0; 12];
 
     // get the input data, counting the input bits to appropriate accumulators
     for line in reader.lines() {
         let input = line.unwrap();
-        for (i, val) in input.chars().enumerate() {
+        in_len = input.trim().len();
+        for (i, val) in input.trim().chars().enumerate() {
             match val {
                 '0' => acc0[i] += 1,
                 '1' => acc1[i] += 1,
-                _ => panic!("invalid accumulator value"),
+                _ => panic!("invalid accumulator value '{}'", val),
             }
         }
     }
 
     // compare each position in the accumulators, building gamma and epsilon
-    for n in 0..acc0.len() {
+    for n in 0..in_len {
         if acc0[n] > acc1[n] {
             gamma[n] = 0;
             epsilon[n] = 1;
@@ -39,23 +41,25 @@ fn main() -> io::Result<()> {
         }
     }
 
-    let g = get_decimal(&gamma);
-    let e = get_decimal(&epsilon);
+    println!("{:?}", &gamma[0..in_len]);
+    println!("{:?}", &epsilon[0..in_len]);
+    println!("{}", get_decimal(&gamma[0..in_len]) * get_decimal(&epsilon[0..in_len]));  // part 1 answer
 
-    println!("{}", g*e);  // part 1 answer
 
     Ok(())
 }
 
-fn get_decimal(bits: &[u8]) -> u32 {
 
-    // read bits from array into a string...
+fn stringify_bitfield(bits: &[u8]) -> String {
+    // read bits from array into a string
     let mut s = String::from("");
     for b in bits {
         s.push(char::from_digit(*b as u32, 10).unwrap());
     }
-
-    // ...in order to convert binary represented in string to decimal
+    s
+}
+fn get_decimal(bits: &[u8]) -> u32 {
+    let s = stringify_bitfield(bits);
     u32::from_str_radix(&s, 2).unwrap()
 }
 
@@ -65,4 +69,5 @@ mod tests {
 
     #[test]
     fn test_1() { assert_eq!(4 + 4, 8); }
+
 }
