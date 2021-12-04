@@ -8,36 +8,71 @@ const FILE: &str = "input.txt";
 fn main() {
 
     let input = fs::read_to_string(FILE).expect("no u");
-    let h = input.matches("\n").count();
+    let lines: Vec<_> = input.lines().collect();
+    let w = lines[0].len();
 
-    let mut g = String::new();
-    let mut e = String::new();
+    let mut g = mode_bits(&lines);
+    let e = flip_bits(&g);
 
-    let acc = count_bits(&input);
-    for b in acc.iter() {
-        if b >= &(h/2) { 
-            g.push_str("1");
-            e.push_str("0");
-        } else {
-            g.push_str("0");
-            e.push_str("1");
-        }
-    }
-
+    println!("{}, {}", &g, &e);  
     println!("{}", get_decimal(&g) * get_decimal(&e));  // part 1 answer
 
+    // -- Part 2 ------------------------------------
+
+    let mut o2: Vec<&str> = lines.iter().cloned()
+            .filter(|line| line.starts_with(&g[..1]))
+            .collect();
+    for x in 1..w {
+        if o2.len() == 1 { break; }
+        g = mode_bits(&o2);
+        o2 = o2.iter().cloned()
+            .filter(|line| line.chars().nth(x).unwrap() == g.chars().nth(x).unwrap())
+            .collect();
+    }
+
+    let mut co2: Vec<&str> = lines.iter().cloned()
+        .filter(|line| line.starts_with(&e[..1]))
+        .collect();
+    for x in 1..w {
+        if co2.len() == 1 { break; }
+        g = flip_bits(&mode_bits(&co2));
+        co2 = co2.iter().cloned()
+            .filter(|line| line.chars().nth(x).unwrap() == g.chars().nth(x).unwrap())
+            .collect();
+    }
+
+    println!("{}, {}", o2[0], co2[0]);
+    println!("{}", get_decimal(&o2[0]) * get_decimal(&co2[0]));  // part 2 answer
 }
 
+fn flip_bits(s: &str) -> String {
+    s.chars()
+        .map(|c| if c == '1' {
+            '0'
+        } else {
+            '1'
+        })
+    .collect()
+}
 
-fn count_bits(input: &str) -> Vec<usize> {
-    let w: usize = input.find("\n").unwrap();
+fn mode_bits(input: &Vec<&str>) -> String {
+    let h = input.len();
+    let w = input[0].len();
     let mut acc:Vec<usize> = vec![0; w];
-    for line in input.lines() {
-        for (i, bit) in line.trim().chars().enumerate() {
+    let mut s = String::new();
+    for line in input {
+        for (i, bit) in line.chars().enumerate() {
             if bit == '1' { acc[i] += 1 }
         }
     }
-    acc
+    for b in acc.iter() {
+        if h-b > *b {
+            s.push_str("0");
+        } else {
+            s.push_str("1");
+        }
+    }
+    s
 }
 
 fn get_decimal(s: &str) -> u32 {
