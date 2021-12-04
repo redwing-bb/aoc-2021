@@ -1,65 +1,46 @@
 // https://adventofcode.com/2021/day/3
 
-use std::fs::File;
-use std::io::{self, prelude::*, BufReader};
-use std::char;
+use std::fs;
 
-fn main() -> io::Result<()> {
+const FILE: &str = "input.txt";
+//const FILE: &str = "input2.txt";
 
-    let file = File::open("input.txt")?;
-    let reader = BufReader::new(file);
+fn main() {
 
-    let mut acc0: [u32; 12] = [0; 12]; // count of the 0 values in each line
-    let mut acc1: [u32; 12] = [0; 12]; // count of the 1 values in each line
-    let mut in_len = 0;
-    let mut gamma: [u8; 12] = [0; 12];
-    let mut epsilon: [u8; 12] = [0; 12];
+    let input = fs::read_to_string(FILE).expect("no u");
+    let h = input.matches("\n").count();
 
-    // get the input data, counting the input bits to appropriate accumulators
-    for line in reader.lines() {
-        let input = line.unwrap();
-        in_len = input.trim().len();
-        for (i, val) in input.trim().chars().enumerate() {
-            match val {
-                '0' => acc0[i] += 1,
-                '1' => acc1[i] += 1,
-                _ => panic!("invalid accumulator value '{}'", val),
-            }
-        }
-    }
+    let mut g = String::new();
+    let mut e = String::new();
 
-    // compare each position in the accumulators, building gamma and epsilon
-    for n in 0..in_len {
-        if acc0[n] > acc1[n] {
-            gamma[n] = 0;
-            epsilon[n] = 1;
-        } else if acc0[n] < acc1[n] {
-            gamma[n] = 1;
-            epsilon[n] = 0;
+    let acc = count_bits(&input);
+    for b in acc.iter() {
+        if b >= &(h/2) { 
+            g.push_str("1");
+            e.push_str("0");
         } else {
-            panic!("don't know what to do if 0 and 1 are equal");
+            g.push_str("0");
+            e.push_str("1");
         }
     }
 
-    println!("{:?}", &gamma[0..in_len]);
-    println!("{:?}", &epsilon[0..in_len]);
-    println!("{}", get_decimal(&gamma[0..in_len]) * get_decimal(&epsilon[0..in_len]));  // part 1 answer
+    println!("{}", get_decimal(&g) * get_decimal(&e));  // part 1 answer
 
-
-    Ok(())
 }
 
 
-fn stringify_bitfield(bits: &[u8]) -> String {
-    // read bits from array into a string
-    let mut s = String::from("");
-    for b in bits {
-        s.push(char::from_digit(*b as u32, 10).unwrap());
+fn count_bits(input: &str) -> Vec<usize> {
+    let w: usize = input.find("\n").unwrap();
+    let mut acc:Vec<usize> = vec![0; w];
+    for line in input.lines() {
+        for (i, bit) in line.trim().chars().enumerate() {
+            if bit == '1' { acc[i] += 1 }
+        }
     }
-    s
+    acc
 }
-fn get_decimal(bits: &[u8]) -> u32 {
-    let s = stringify_bitfield(bits);
+
+fn get_decimal(s: &str) -> u32 {
     u32::from_str_radix(&s, 2).unwrap()
 }
 
