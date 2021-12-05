@@ -12,8 +12,8 @@ fn main() {
     let input = fs::read_to_string(FILE).expect("no u");
     let mut lines: Vec<_> = input.lines().collect();
 
-    // get the number draws for the bingo caller
-    let draws = get_draws(lines[0].clone());
+    // get the numbers drawn by the bingo caller
+    let numbers = get_numbers(lines[0].clone());
 
     // build the bingo cards
     lines[0] = "";
@@ -36,74 +36,93 @@ fn main() {
 //    println!("{}, {:?}", boards.len(), boards);
 //    println!("{}, {:?}", marks.len(), marks);
 
-    let mut winner = 0;
-    let mut call = 0;
-    'drawing: for draw in draws {
+    let mut winners: Vec<usize> = Vec::new();
+    let mut win_at: Vec<u32> = Vec::new();
+    for num in numbers {
         // mark boards
-        for z in 0..boards.len() {
-            for x in 0..5 {
-                for y in 0..5 {
-                    if boards[z][(x, y)] == draw {
-                        marks[z][(x, y)] = true;
-                        // println!("match found: {}", draw);
+        for board in 0..boards.len() {
+            if !winners.contains(&board) {
+                for x in 0..5 {
+                    for y in 0..5 {
+                        if boards[board][(x, y)] == num {
+                            marks[board][(x, y)] = true;
+                            // println!("match found: {}", num);
+                        }
                     }
                 }
             }
         }
 
         // check for bingos
-        for z in 0..boards.len() {
-            // check rows
-            for y in 0..5 {
-                let score =  marks[z].row_iter(y)
-                    .filter(|square| **square == true)
-                    .count();
-                if score == 5 {
-                    println!("winning card: #{}", z);
-                    winner = z;
-                    call = draw;
-                    break 'drawing;
+        for board in 0..boards.len() {
+            if !winners.contains(&board) {
+                // rows
+                for y in 0..5 {
+                    let score =  marks[board].row_iter(y)
+                        .filter(|square| **square == true)
+                        .count();
+                    if score == 5 {
+                        println!("winning card: #{}", board);
+                        winners.push(board);
+                        win_at.push(num);
+                    }
                 }
-            }
-            // check columns
-            for x in 0..5 {
-                let score = marks[z].column_iter(x)
-                    .filter(|square| **square == true)
-                    .count();
-                if score == 5 {
-                    println!("winning card: #{}", z);
-                    winner = z;
-                    call = draw;
-                    break 'drawing;
+                // columns
+                for x in 0..5 {
+                    let score = marks[board].column_iter(x)
+                        .filter(|square| **square == true)
+                        .count();
+                    if score == 5 {
+                        println!("winning card: #{}", board);
+                        winners.push(board);
+                        win_at.push(num);
+                    }
                 }
             }
         }
     }
-    // get winning board
-    for row in boards[winner].as_rows() {
-        println!("{:?}", row);
-    }
-    for row in marks[winner].as_rows() {
-        println!("{:?}", row);
-    }
 
+    // part 1
+    for row in boards[winners[0]].as_rows() {
+        println!("{:?}", row);
+    }
+    for row in marks[winners[0]].as_rows() {
+        println!("{:?}", row);
+    }
     let mut score: u32 = 0;
     for y in 0..5 {
         for x in 0..5 {
-            if marks[winner][(y,x)] == false {
-                score += boards[winner][(y,x)];
+            if marks[winners[0]][(y,x)] == false {
+                score += boards[winners[0]][(y,x)];
             }
         }
     }
-    println!("{}, {}, {}", score, call, score*call);
+    println!("{}, {}, {}", score, win_at[0], score*win_at[0]);
+
+    // part 2
+    score = 0;
+    for row in boards[winners[*winners.last().unwrap()]].as_rows() {
+        println!("{:?}", row);
+    }
+    for row in marks[winners[*winners.last().unwrap()]].as_rows() {
+        println!("{:?}", row);
+    }
+    for y in 0..5 {
+        for x in 0..5 {
+            if marks[*winners.last().unwrap()][(y,x)] == false {
+                score += boards[*winners.last().unwrap()][(y,x)];
+            }
+        }
+    }
+    println!("{}, {}, {}", score, win_at.last().unwrap(), score*win_at.last().unwrap());
 }
 
 
-fn get_draws(input: &str) -> Vec<u32> {
-    let draws: Vec<u32> = input.split(",")
+fn get_numbers(input: &str) -> Vec<u32> {
+    let numbers: Vec<u32> = input.split(",")
         .map(|n| n.parse().unwrap())
         .collect();
-        draws
+        numbers
 }
 
 
