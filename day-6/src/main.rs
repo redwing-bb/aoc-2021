@@ -13,7 +13,7 @@ fn main() {
         .map(|f| f.parse().unwrap())
         .collect();
 
-    for i in 0..80 {
+    for _i in 0..80 {
         let mut babies: Vec<u32> = Vec::new();
         for x in 0..fish.len() {
             if fish[x] == 0 {
@@ -27,6 +27,30 @@ fn main() {
         //println!("{}, {}, {:?}", i+1, fish.len(), fish);
     }
     println!("{}", fish.len());
+
+
+    // part 2 
+    let input = fs::read_to_string(FILE).expect("no u");
+    let fish: Vec<u32> = input.trim().split(",")
+        .map(|f| f.parse().unwrap())
+        .collect();
+
+    let mut timers: [u64; 9] = [0; 9];
+    for f in fish {
+        timers[f as usize] += 1;
+    }
+
+    println!("{:?}", timers);
+
+    for _i in 0..256 {
+        let babies = timers[0];
+        timers.rotate_left(1);
+        timers[6] += babies;
+    }
+
+    let p2: u64 = timers.iter().sum();
+    println!("{:?}", p2);
+
 }
 
 
