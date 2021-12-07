@@ -2,8 +2,8 @@
 
 use std::fs;
 
-const FILE: &str = "input.txt";
-//const FILE: &str = "input2.txt";
+//const FILE: &str = "input.txt";
+const FILE: &str = "input2.txt";
 
 fn main() {
 
@@ -13,6 +13,7 @@ fn main() {
         .map(|f| f.parse().unwrap())
         .collect();
 
+    for crab in crabs 
 }
 
 
